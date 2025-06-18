@@ -1,0 +1,22 @@
+{
+    "name": "yobib/back-end",
+    "autoload": {
+        "psr-4": {
+            "Yobib\\BackEnd\\": "src/",
+            "config\\": "config/", 
+            "controllers\\": "controllers/", 
+            "routes\\": "routes/",
+            "model\\": "model/"
+
+        }
+    },
+    "authors": [
+        {
+            "name": "yobi Ba",
+            "email": "yobibah7295@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
