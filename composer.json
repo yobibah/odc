@@ -17,6 +17,9 @@
         }
     ],
     "require": {
-        "vlucas/phpdotenv": "^5.6"
+        "vlucas/phpdotenv": "^5.6",
+        "faso-dev/orange-money-burkina-sdk": "^1.1",
+        "rinvex/countries": "^9.0",
+        "phpmailer/phpmailer": "^6.10"
     }
 }

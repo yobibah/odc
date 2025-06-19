@@ -10,6 +10,7 @@ class ComposerStaticInit05c23330ef4b59029af0395f5db0afbd
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
+        '3c3a02bc9945aa3571024986c07a1e55' => __DIR__ . '/..' . '/rinvex/countries/src/helpers.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -36,13 +37,22 @@ class ComposerStaticInit05c23330ef4b59029af0395f5db0afbd
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Ctype\\' => 23,
         ),
+        'R' => 
+        array (
+            'Rinvex\\Country\\' => 15,
+        ),
         'P' => 
         array (
             'PhpOption\\' => 10,
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'G' => 
         array (
             'GrahamCampbell\\ResultType\\' => 26,
+        ),
+        'F' => 
+        array (
+            'Fasodev\\' => 8,
         ),
         'D' => 
         array (
@@ -83,13 +93,25 @@ class ComposerStaticInit05c23330ef4b59029af0395f5db0afbd
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
+        'Rinvex\\Country\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/rinvex/countries/src',
+        ),
         'PhpOption\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
         ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
         'GrahamCampbell\\ResultType\\' => 
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
+        ),
+        'Fasodev\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/faso-dev/orange-money-burkina-sdk/src',
         ),
         'Dotenv\\' => 
         array (

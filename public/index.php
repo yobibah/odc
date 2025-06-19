@@ -6,8 +6,8 @@ require_once __DIR__ . '/../src/App.php';
 use src\App;
 use routes\Router;
 use controllers\HomeControllers;
-use controllers\BailleurControllers;
-use controllers\ClientControllers;
+use controllers\MedocControllers;
+use controllers\UsersControllers;
 use controllers\AgentControllers;
 
 App::init();
@@ -25,8 +25,13 @@ define('VIEW_PATH', realpath(__DIR__ . '/../views/') . DIRECTORY_SEPARATOR);
 $router = new Router();
 // point d'entrée pour les routes
 $router->register('/', ['controllers\HomeControllers', 'index']);
-$router->register('/test', ['controllers\HomeControllers', 'test']);
+$router->register('/mes-medicaments', ['controllers\MedocControllers', 'mes_medicaments']);
+$router->register('/supprimer-medicament', ['controllers\MedocControllers', 'supprimer']);
 
+
+
+$router->register('/nouveau-client', ['controllers\UsersControllers', 'inscription']);
+$router->register('/login', ['controllers\UsersControllers', 'login']);
 
 
 
