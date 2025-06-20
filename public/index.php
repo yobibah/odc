@@ -7,7 +7,7 @@ use src\App;
 use routes\Router;
 use controllers\HomeControllers;
 use controllers\MedocControllers;
-use controllers\UsersControllers;
+use controllers\RdvControllers;
 use controllers\AgentControllers;
 
 App::init();
@@ -27,12 +27,18 @@ $router = new Router();
 $router->register('/', ['controllers\HomeControllers', 'index']);
 $router->register('/mes-medicaments', ['controllers\MedocControllers', 'mes_medicaments']);
 $router->register('/supprimer-medicament', ['controllers\MedocControllers', 'supprimer']);
+$router->register('/ajouter-medicament', ['controllers\MedocControllers', 'ajouter']);
 
 
 
 $router->register('/nouveau-client', ['controllers\UsersControllers', 'inscription']);
+$router->register('/mon-profil', ['controllers\UsersControllers', 'monProfil']);
 $router->register('/login', ['controllers\UsersControllers', 'login']);
+$router->register('/logout', ['controllers\UsersControllers', 'logout']);
+$router->register('/mes-rendez-vous', ['controllers\RdvControllers', 'mesRdv']);
+$router->register('/mes-supprimer-ce-rdv', ['controllers\RdvControllers', 'supprimerRdv']);
 
+$router->register('/modifier-supprimer-ce-rdv', ['controllers\RdvControllers', 'modifierRdv']);
 
 
 

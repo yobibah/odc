@@ -29,7 +29,7 @@ class RdvBDD extends Rdv{
     }
 
     public function mes_rdv($id){
-        $sql = "SELECT * FROM rdv WHERE id_client=:id";
+        $sql = "SELECT * FROM rdv WHERE users_id=:id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':id', $id, \PDO::PARAM_STR);
         $stmt->execute();
@@ -37,10 +37,11 @@ class RdvBDD extends Rdv{
         return $result;
     }
 
-    public function supprimer_rdv($id){
-        $sql = "DELETE FROM rdv WHERE id_client  =:id";
+    public function supprimer_rdv($id,$id_rdv){
+        $sql = "DELETE FROM rdv WHERE users_id  =:id AND id_rdv =:id_rdv";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':id', $id, \PDO::PARAM_STR);
+          $stmt->bindValue(':id_rdv', $id_rdv, \PDO::PARAM_STR);
         $stmt->execute();
     }
 
@@ -79,6 +80,27 @@ class RdvBDD extends Rdv{
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+
+    public function getMail($users_id){
+        $sql = "SELECT email FROM users WHERE id_users =:users_id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':users_id', $users_id, \PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result['email'];
+    
+    }
+
+    public function supprimer_rdv_unique($id_client, $id_rdv) {
+    $sql = "DELETE FROM rdv WHERE id_client = :id_client AND id_rdv = :id_rdv";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->bindValue(':id_client', $id_client, \PDO::PARAM_INT);
+    $stmt->bindValue(':id_rdv', $id_rdv, \PDO::PARAM_INT);
+    return $stmt->execute();
 }
+
+}
+
 
 

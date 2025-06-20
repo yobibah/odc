@@ -2,7 +2,7 @@
 namespace controllers;
 
 use model\users;
-use UsersBDD;
+use model\UsersBDD;
 
 class UsersControllers {
 
@@ -31,16 +31,13 @@ class UsersControllers {
         }
     }
 
-    public function login() {
-        $input = json_decode(file_get_contents('php://input'), true);
+public function login() {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $bdd = new UsersBDD();
 
-        if (!isset($input['telephone'], $input['mdp'])) {
-            return $this->sendJson(['error' => 'Téléphone et mot de passe requis'], 400);
-        }
-
-        $bdd = new UsersBDD();
-        $result = $bdd->login($input['telephone'], $input['mdp']);
-
+    // 🔁 Connexion par token si fourni
+    if (isset($input['token'])) {
+        $result = $bdd->getUserByToken($input['token']); // méthode à créer dans UsersBDD
         if ($result) {
             $user = $result['users'];
             return $this->sendJson([
@@ -52,9 +49,38 @@ class UsersControllers {
                 'token' => $user->get_Token()
             ]);
         } else {
-            return $this->sendJson(['error' => 'Identifiants invalides'], 401);
+            return $this->sendJson(['error' => 'Token invalide'], 401);
         }
     }
+
+    // 🔐 Connexion classique
+    if (!isset($input['telephone'], $input['mdp'])) {
+        return $this->sendJson(['error' => 'Téléphone et mot de passe requis'], 400);
+    }
+
+    $result = $bdd->login($input['telephone'], $input['mdp']);
+
+    if ($result) {
+        $user = $result['users'];
+
+        // ✅ Générer un nouveau token
+        $token = bin2hex(random_bytes(32));
+     
+        $bdd->updateToken($result['id_users'], $token); // méthode à créer
+
+        return $this->sendJson([
+            'status' => 'success',
+            'id_users' => $result['id_users'],
+            'username' => $user->getUsername(),
+            'telephone' => $user->getTelephone(),
+            'numero_personne_rev' => $user->numero_peronne_rev(),
+            'token' => $token
+        ]);
+    } else {
+        return $this->sendJson(['error' => 'Identifiants invalides'], 401);
+    }
+}
+
 
     public function autoLogin() {
         $bdd = new UsersBDD();
@@ -76,18 +102,21 @@ class UsersControllers {
     }
 
     public function monProfil() {
+        /*
         if (!isset($_GET['id'])) {
             return $this->sendJson(['error' => 'ID utilisateur manquant'], 400);
         }
+            */
+        $id= 1;
 
         $bdd = new UsersBDD();
-        $result = $bdd->mon_profil_utilisateur((int)$_GET['id']);
+        $result = $bdd->mon_profil_utilisateur($id);
 
         if ($result) {
             $user = $result['users'];
             return $this->sendJson([
                 'status' => 'ok',
-                'id_users' => $result['id_users'],
+                'id_users' => $result['users_id'],
                 'username' => $user->getUsername(),
                 'telephone' => $user->getTelephone(),
                 'numero_personne_rev' => $user->numero_peronne_rev(),

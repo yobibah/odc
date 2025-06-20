@@ -7,8 +7,8 @@ use model\MedicammentBDD;
 
 class MedocControllers extends Controllers{
 
-
-         public function ajouter() {
+        public function ajouter() {
+            
         $input = json_decode(file_get_contents('php://input'), true);
 
         if (!isset($input['id_client'], $input['libelle'], $input['heur_prise'])) {
@@ -59,7 +59,7 @@ public function mes_medicaments() {
             return $this->sendJson(['error' => 'ID médicament manquant'], 400);
         }
 
-        $bdd = new MedicammentBDD();
+        $bdd = new MedicammentBDD();    
         $bdd->supprimer_medicament((int)$input['id_medicament']);
 
         return $this->sendJson(['status' => 'Médicament supprimé']);
@@ -74,3 +74,4 @@ public function mes_medicaments() {
         exit;
     }
 }
+    

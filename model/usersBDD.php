@@ -1,8 +1,9 @@
 <?php 
 //cette partie conerne la connexion et suivis du users 
-
+namespace model;
 use model\users;
 use config\Config;
+use PDO;
 
 class UsersBDD extends Users{
     private $pdo;
@@ -89,22 +90,49 @@ public function login($telephone, $mdp) {
 }
 
 
-public function mon_profil_utilisateur($id_utilisateur){
-    $sql="SELECT * FROM users WHERE users_id = : id";
+public function mon_profil_utilisateur($users_id){
+    $sql="SELECT * FROM users WHERE users_id = :users_id";
     $smt= $this->pdo->prepare($sql);
-    $smt->bindValue(':id',$id_utilisateur,PDO::PARAM_INT);
+    $smt->bindValue(':users_id',$users_id,PDO::PARAM_INT);
      if ($smt->execute()) {
         $resultats = $smt->fetchAll(PDO::FETCH_ASSOC);
 
         if (count($resultats) > 0) {
             foreach ($resultats as $rs) {
                  return [
-                'id_users' => $rs['id_users'],
-                'users' => new users($rs['username'], $rs['mdp'], $rs['telephone'], $rs['ps_cas'],$rs['auth_token'])
+                'users_id' => $rs['users_id'],
+                'users' => new users($rs['username'], $rs['mdp'], $rs['telephone'], $rs['num_pav'],$rs['auth_token'])
             ];
             }
 }
      }
+}
+
+public function updateToken($id_users, $token) {
+    $stmt = $this->pdo->prepare("UPDATE users SET token = :token WHERE id_users = :id_users");
+    $stmt->execute([
+        ':token' => $token,
+        ':id_users' => $id_users
+    ]);
+}
+
+public function getUserByToken($token) {
+    $stmt = $this->pdo->prepare("SELECT * FROM users WHERE token = :token");
+    $stmt->execute([':token' => $token]);
+    $row = $stmt->fetch();
+
+    if ($row) {
+        $user = new users(
+            $row['username'],
+            $row['mdp'],
+            $row['telephone'],
+            $row['numero_personne_rev'],
+            $row['token']
+        );
+        return ['id_users' => $row['id_users'], 'users' => $user];
+    }
+
+    return null;
 }
 
 
