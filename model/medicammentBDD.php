@@ -12,8 +12,8 @@ class MedicammentBDD extends Medicament{
     }
 
     public function ajouter_medicament(Medicament $medicament){
-        $stm = $this->pdo->prepare("INSERT INTO medicament (id_client,libelle,heur_prise) VALUES (:id_client, :libelle, :heur_prise)");
-        $stm->bindValue(":id_client", $medicament->getId_client());
+        $stm = $this->pdo->prepare("INSERT INTO medicament (users_id,libelle,heur_prise) VALUES (:users_id, :libelle, :heur_prise)");
+        $stm->bindValue(":users_id", $medicament->getId_client());
         $stm->bindValue(":libelle", $medicament->getLibelle());
         $stm->bindValue(":heur_prise", $medicament->getHeureprise());
         $stm->execute();
@@ -39,7 +39,7 @@ public function mes_medicaments($id_client) {
 
 
     public function supprimer_medicament($id_medicament){
-        $stm = $this->pdo->prepare("DELETE FROM medicament WHERE id_medicament = :id_medicament");
+        $stm = $this->pdo->prepare("DELETE FROM medicament WHERE id_medoc = :id_medicament");
         $stm->bindValue(":id_medicament", $id_medicament);
         $stm->execute();
     }

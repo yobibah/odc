@@ -11,6 +11,7 @@ class RdvControllers extends Controllers
     // 🔹 Ajouter un rendez-vous
     public function ajouterRdv()
     {
+        header("Access-Control-Allow-Origin: POST");
         $input = json_decode(file_get_contents("php://input"), true);
         if (!isset($input['heur_rdv'], $input['hopitale_rdv'], $input['date_rdv'], $input['id_client'])) {
             return $this->sendJson(['error' => 'Champs manquants'], 400);
@@ -32,6 +33,7 @@ class RdvControllers extends Controllers
     // 🔹 Consulter les rendez-vous d’un client
 public function mesRdv()
 {
+    header("Access-Control-Allow-Origin: GET");
     if (!isset($_GET['users_id'])) {
         return $this->sendJson(['error' => 'users_id requis'], 400);
     }
@@ -64,6 +66,7 @@ public function mesRdv()
     // 🔹 Supprimer les rdv d’un client
     public function supprimerRdv()
     {
+        header("Access-Control-Allow-Origin: DELETE");
         if (!isset($_SESSION['users_id'])) {
             return $this->sendJson(['error' => 'users_id requis'], 400);
         }
@@ -78,6 +81,7 @@ public function mesRdv()
     // 🔹 Modifier un rdv existant
     public function modifierRdv()
     {
+        header("Access-Control-Allow-Origin: PUT");
         $input = json_decode(file_get_contents("php://input"), true);
 
         if (!isset($input['heur_rdv'], $input['hopitale_rdv'], $input['date_rdv'], $input['id_rdv'], $input['id_client'])) {
@@ -100,6 +104,7 @@ public function mesRdv()
     // 🔹 Relancer les clients ayant un rdv aujourd’hui à 07h
     public function relancerRdv7h()
     {
+        header("Access-Control-Allow-Origin: POST");
         $bdd = new RdvBDD();
         $rdvs = $bdd->getRdvsDuJour7h();
 
@@ -117,6 +122,7 @@ public function mesRdv()
     // 🔸 Envoi d'email (PHPMailer)
     private function envoyerMail()
     {
+         
         $mail = new PHPMailer(true);
         if(isset($_SESSION['users_id'])){
             $email= new RdvBDD();

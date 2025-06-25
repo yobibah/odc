@@ -7,9 +7,10 @@ use model\UsersBDD;
 class UsersControllers {
 
     public function inscription() {
+         header("Access-Control-Allow-Origin: POST");
         $input = json_decode(file_get_contents('php://input'), true);
 
-        if (!isset($input['username'], $input['mdp'], $input['telephone'], $input['numero_personne_rev'])) {
+        if (!isset($input['username'], $input['mdp'], $input['telephone'], $input['num_pav'])) {
             return $this->sendJson(['error' => 'Champs requis manquants'], 400);
         }
         $auth=null;
@@ -17,7 +18,7 @@ class UsersControllers {
             $input['username'],
             $input['mdp'],
             $input['telephone'],
-            $input['numero_personne_rev'],
+            $input['num_pav'],
             $auth
         );
 
@@ -32,6 +33,7 @@ class UsersControllers {
     }
 
 public function login() {
+    header("Access-Control-Allow-Origin: POST");
     $input = json_decode(file_get_contents('php://input'), true);
     $bdd = new UsersBDD();
 
@@ -42,7 +44,7 @@ public function login() {
             $user = $result['users'];
             return $this->sendJson([
                 'status' => 'success',
-                'id_users' => $result['id_users'],
+                'users_id' => $result['users_id'],
                 'username' => $user->getUsername(),
                 'telephone' => $user->getTelephone(),
                 'numero_personne_rev' => $user->numero_peronne_rev(),
@@ -66,15 +68,15 @@ public function login() {
         // ✅ Générer un nouveau token
         $token = bin2hex(random_bytes(32));
      
-        $bdd->updateToken($result['id_users'], $token); // méthode à créer
+        $bdd->updateToken($result['users_id'], $token); // méthode à créer
 
         return $this->sendJson([
             'status' => 'success',
-            'id_users' => $result['id_users'],
+            'users_id' => $result['users_id'],
             'username' => $user->getUsername(),
             'telephone' => $user->getTelephone(),
             'numero_personne_rev' => $user->numero_peronne_rev(),
-            'token' => $token
+            'auth_token' => $token
         ]);
     } else {
         return $this->sendJson(['error' => 'Identifiants invalides'], 401);
@@ -83,6 +85,7 @@ public function login() {
 
 
     public function autoLogin() {
+        header("Access-Control-Allow-Origin: GET");
         $bdd = new UsersBDD();
         $result = $bdd->autoLogin();
 
@@ -102,6 +105,7 @@ public function login() {
     }
 
     public function monProfil() {
+        header("Access-Control-Allow-Origin: GET");
         /*
         if (!isset($_GET['id'])) {
             return $this->sendJson(['error' => 'ID utilisateur manquant'], 400);

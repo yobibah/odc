@@ -3,7 +3,7 @@
         'name' => 'yobib/back-end',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '251f798d4f8d5050174b5e3f4ea936b5ac0915da',
+        'reference' => '10adf6beb142935ebbc0e7fb3b9f256167bbd93c',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -94,7 +94,7 @@
         'yobib/back-end' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '251f798d4f8d5050174b5e3f4ea936b5ac0915da',
+            'reference' => '10adf6beb142935ebbc0e7fb3b9f256167bbd93c',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

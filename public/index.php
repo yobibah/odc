@@ -8,7 +8,9 @@ use routes\Router;
 use controllers\HomeControllers;
 use controllers\MedocControllers;
 use controllers\RdvControllers;
-use controllers\AgentControllers;
+use controllers\IpnControllers;
+use controllers\UsersControllers;
+use controllers\CliniqueControllers;
 
 App::init();
 // Gestion du chemin des assets pour test local (sans -t public) ou production
@@ -28,6 +30,16 @@ $router->register('/', ['controllers\HomeControllers', 'index']);
 $router->register('/mes-medicaments', ['controllers\MedocControllers', 'mes_medicaments']);
 $router->register('/supprimer-medicament', ['controllers\MedocControllers', 'supprimer']);
 $router->register('/ajouter-medicament', ['controllers\MedocControllers', 'ajouter']);
+
+
+$router->register('/les-cliniques', ['controllers\CliniqueControllers', 'show']);
+$router->register('/clinique-localisation', ['controllers\CliniqueControllers', 'get_by_location']);
+$router->register('/clinique-adresse', ['controllers\CliniqueControllers', 'get_by_quartier_ville']);
+$router->register('/les-', ['controllers\CliniqueControllers', 'ajouter']);
+
+
+
+$router->register('/ipn/paiement', ['controllers\IpnControllers', 'test']);
 
 
 

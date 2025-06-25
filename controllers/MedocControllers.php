@@ -8,15 +8,17 @@ use model\MedicammentBDD;
 class MedocControllers extends Controllers{
 
         public function ajouter() {
-            
+         header("Access-Control-Allow-Origin: POST");
+        
+
         $input = json_decode(file_get_contents('php://input'), true);
 
-        if (!isset($input['id_client'], $input['libelle'], $input['heur_prise'])) {
+        if (!isset($input['users_id'], $input['libelle'], $input['heur_prise'])) {
             return $this->sendJson(['error' => 'Champs manquants'], 400);
         }
 
         $medicament = new Medicament(
-            $input['id_client'],
+            $input['users_id'],
             $input['libelle'],
             $input['heur_prise']
         );
@@ -28,6 +30,7 @@ class MedocControllers extends Controllers{
     }
 
 public function mes_medicaments() {
+    header("Access-Control-Allow-Origin: GET");
     // Pour test, id_client en dur
     $id_client = 1;
 
@@ -53,14 +56,15 @@ public function mes_medicaments() {
 
 
     public function supprimer() {
+        header("Access-Control-Allow-Origin: DELETE");
         $input = json_decode(file_get_contents('php://input'), true);
 
-        if (!isset($input['id_medicament'])) {
+        if (!isset($input['id_medoc'])) {
             return $this->sendJson(['error' => 'ID médicament manquant'], 400);
         }
 
         $bdd = new MedicammentBDD();    
-        $bdd->supprimer_medicament((int)$input['id_medicament']);
+        $bdd->supprimer_medicament((int)$input['id_medoc']);
 
         return $this->sendJson(['status' => 'Médicament supprimé']);
     }
