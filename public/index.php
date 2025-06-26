@@ -26,7 +26,7 @@ define('VIEW_PATH', realpath(__DIR__ . '/../views/') . DIRECTORY_SEPARATOR);
 
 $router = new Router();
 // point d'entrée pour les routes
-$router->register('/', ['controllers\HomeControllers', 'index']);
+$router->register('/', ['controllers\UsersControllers', 'login']);
 $router->register('/mes-medicaments', ['controllers\MedocControllers', 'mes_medicaments']);
 $router->register('/supprimer-medicament', ['controllers\MedocControllers', 'supprimer']);
 $router->register('/ajouter-medicament', ['controllers\MedocControllers', 'ajouter']);

@@ -4,7 +4,7 @@ namespace controllers;
 use model\Clinique;
 use model\CliniqueBDD;
 
-class CliniqueControllers extends Controllers
+class CliniqueControllers extends HomeControllers
 {
     public function ajouter()
     {

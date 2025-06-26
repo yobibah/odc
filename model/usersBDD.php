@@ -15,28 +15,24 @@ class UsersBDD extends Users
         $this->pdo = Config::getpdo()->getconnexion();
     }
 
-    public function login($telephone, $mdp)
+    public function login($username, $mdp)
     {
-        $sql = "SELECT * FROM users WHERE telephone = :telephone";
+        $sql = "SELECT * FROM users WHERE username = :username";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindValue(':telephone', $telephone, PDO::PARAM_STR);
+        $stmt->bindValue(':username', $username, PDO::PARAM_STR);
 
         if ($stmt->execute()) {
             $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             if (count($resultats) > 0) {
                 foreach ($resultats as $rs) {
-                    if ($rs['mdp'] === $mdp) {
+                    if (password_verify($mdp, $rs['mdp'])) {
                         $token = bin2hex(random_bytes(32));
-                        $update = $this->pdo->prepare("UPDATE users SET auth_token = :auth_token WHERE users_id = :id");
-                        $update->execute([
-                            ':auth_token' => $token,
-                            ':id' => $rs['users_id']
-                        ]);
+                        $this->updateToken($rs['users_id'], $token);
                         setcookie('auth_token', $token, time() + (86400 * 7), "/", "", false, true);
                         return [
                             'users_id' => $rs['users_id'],
-                            'users' => new Users($rs['username'], $rs['mdp'], $rs['telephone'], $rs['ps_cas'], $rs['auth_token'])
+                            'users' => new Users($rs['username'], $rs['mdp'], $rs['username'], $rs['ps_cas'], $rs['auth_token'])
                         ];
                     }
                 }

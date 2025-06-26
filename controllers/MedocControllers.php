@@ -1,15 +1,18 @@
 <?php
+
 namespace controllers;
 
 
 use model\Medicament;
 use model\MedicammentBDD;
 
-class MedocControllers extends Controllers{
+class MedocControllers extends HomeControllers
+{
 
-        public function ajouter() {
-         header("Access-Control-Allow-Origin: POST");
-        
+    public function ajouter()
+    {
+        header("Access-Control-Allow-Origin: POST");
+
 
         $input = json_decode(file_get_contents('php://input'), true);
 
@@ -29,33 +32,35 @@ class MedocControllers extends Controllers{
         return $this->sendJson(['status' => 'Médicament ajouté avec succès']);
     }
 
-public function mes_medicaments() {
-    header("Access-Control-Allow-Origin: GET");
-    // Pour test, id_client en dur
-    $id_client = 1;
+    public function mes_medicaments()
+    {
+        header("Access-Control-Allow-Origin: GET");
+        // Pour test, id_client en dur
+        $id_client = 1;
 
-    $bdd = new MedicammentBDD();
-    $result = $bdd->mes_medicaments($id_client);
+        $bdd = new MedicammentBDD();
+        $result = $bdd->mes_medicaments($id_client);
 
-    if ($result && count($result) > 0) {
-        $data = [];
+        if ($result && count($result) > 0) {
+            $data = [];
 
-        foreach ($result as $rs) {
-            $data[] = [
-                'id_medicament' => $rs['id_medicament'],
-                'libelle' => $rs['medicament']->getLibelle(),
-                'heure_prise' => $rs['medicament']->getHeureprise()
-            ];
+            foreach ($result as $rs) {
+                $data[] = [
+                    'id_medicament' => $rs['id_medicament'],
+                    'libelle' => $rs['medicament']->getLibelle(),
+                    'heure_prise' => $rs['medicament']->getHeureprise()
+                ];
+            }
+
+            return $this->sendJson($data);
+        } else {
+            return $this->sendJson(['message' => 'Aucun médicament trouvé'], 204);
         }
-
-        return $this->sendJson($data);
-    } else {
-        return $this->sendJson(['message' => 'Aucun médicament trouvé'], 204);
     }
-}
 
 
-    public function supprimer() {
+    public function supprimer()
+    {
         header("Access-Control-Allow-Origin: DELETE");
         $input = json_decode(file_get_contents('php://input'), true);
 
@@ -63,19 +68,9 @@ public function mes_medicaments() {
             return $this->sendJson(['error' => 'ID médicament manquant'], 400);
         }
 
-        $bdd = new MedicammentBDD();    
+        $bdd = new MedicammentBDD();
         $bdd->supprimer_medicament((int)$input['id_medoc']);
 
         return $this->sendJson(['status' => 'Médicament supprimé']);
     }
-
- 
-    private function sendJson($data, $status = 200) {
-        http_response_code($status);
-        header("Access-Control-Allow-Origin: *");
-        header("Content-Type: application/json");
-        echo json_encode($data);
-        exit;
-    }
 }
-    

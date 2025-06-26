@@ -11,11 +11,11 @@ class UsersControllers extends HomeControllers
     public function inscription()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $username = isset(htmlspecialchars($_POST['username'])) ? htmlspecialchars($_POST['username']) : null;
-            $mdp = isset(htmlspecialchars($_POST['mdp'])) ? htmlspecialchars($_POST['mdp']) : null;
-            $mdp2 = isset(htmlspecialchars($_POST['mdp2'])) ? htmlspecialchars($_POST['mdp2']) : null;
-            $telephone = isset(htmlspecialchars($_POST['telephone'])) ? htmlspecialchars($_POST['telephone']) : null;
-            $num_pav = isset(htmlspecialchars($_POST['num_pav'])) ? htmlspecialchars($_POST['num_pav']) : null;
+            $username = htmlspecialchars($_POST['username']) ? htmlspecialchars($_POST['username']) : null;
+            $mdp = htmlspecialchars($_POST['mdp']) ? htmlspecialchars($_POST['mdp']) : null;
+            $mdp2 = htmlspecialchars($_POST['mdp2']) ? htmlspecialchars($_POST['mdp2']) : null;
+            $telephone = htmlspecialchars($_POST['telephone']) ? htmlspecialchars($_POST['telephone']) : null;
+            $num_pav = htmlspecialchars($_POST['num_pav']) ? htmlspecialchars($_POST['num_pav']) : null;
             $auth = null;
             if ($mdp === $mdp2) {
                 $hash = password_hash($mdp, PASSWORD_DEFAULT);
@@ -73,9 +73,9 @@ class UsersControllers extends HomeControllers
             }
         }
         // 🔐 Connexion classique
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $username = isset(htmlspecialchars($_POST['username'])) ? htmlspecialchars($_POST['username']) : null;
-            $mdp = isset(htmlspecialchars($_POST['mdp'])) ? htmlspecialchars($_POST['mdp']) : null;
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = htmlspecialchars($_POST['username']) ? htmlspecialchars($_POST['username']) : null;
+            $mdp = htmlspecialchars($_POST['mdp']) ? htmlspecialchars($_POST['mdp']) : null;
             $result = $bdd->login($username, $mdp);
             if ($result) {
                 // ✅ Générer un nouveau token
@@ -94,10 +94,10 @@ class UsersControllers extends HomeControllers
                 );
             } else {
                 $_SESSION['msg'] = 'Identifiants invalides';
-                return $this->requireAuth();
+                return $this->render('auth/login', ['error' => $_SESSION['msg']]);
             }
         } else {
-            return $this->requireAuth();
+            return $this->render('auth/login');
         }
     }
 
