@@ -13,7 +13,7 @@ class users{
         $this->password=$password;
         $this->numero_peronne_rev=$numero_peronne_rev;
         $this->telephone=$telephone ;
-         $this->auth_token=$auth_token ;
+        $this->auth_token=$auth_token ;
     }
 
     public function getusername(){

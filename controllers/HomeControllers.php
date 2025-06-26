@@ -12,15 +12,10 @@ class HomeControllers extends Controllers {
             'title' => 'Home',
             'content' => 'Bienvenue sur notre API'
         ];
-
         header("Access-Control-Allow-Origin: *");
         header("Content-Type: application/json");
-        echo json_encode($data); 
+        echo json_encode($data);
         return;
     }
-
     // Liste des pays africains avec indicatif
-   
-
-
 }
