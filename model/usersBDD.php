@@ -53,8 +53,6 @@ class UsersBDD extends Users
             ':mdp' => $users->getPassword(),
             ':telephone' => $users->getTelephone(),
             ':num_pav' => $users->numero_peronne_rev()
-
-
         ]);
     }
 

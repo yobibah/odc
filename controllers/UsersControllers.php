@@ -1,90 +1,102 @@
 <?php
+
 namespace controllers;
 
 use model\users;
 use model\UsersBDD;
 
-class UsersControllers {
-
-    public function inscription() {
-         header("Access-Control-Allow-Origin: POST");
-        $input = json_decode(file_get_contents('php://input'), true);
-
-        if (!isset($input['username'], $input['mdp'], $input['telephone'], $input['num_pav'])) {
-            return $this->sendJson(['error' => 'Champs requis manquants'], 400);
+class UsersControllers extends HomeControllers
+{
+    //inscription
+    public function inscription()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $username = isset(htmlspecialchars($_POST['username'])) ? htmlspecialchars($_POST['username']) : null;
+            $mdp = isset(htmlspecialchars($_POST['mdp'])) ? htmlspecialchars($_POST['mdp']) : null;
+            $mdp2 = isset(htmlspecialchars($_POST['mdp2'])) ? htmlspecialchars($_POST['mdp2']) : null;
+            $telephone = isset(htmlspecialchars($_POST['telephone'])) ? htmlspecialchars($_POST['telephone']) : null;
+            $num_pav = isset(htmlspecialchars($_POST['num_pav'])) ? htmlspecialchars($_POST['num_pav']) : null;
+            $auth = null;
+            if ($mdp === $mdp2) {
+                $hash = password_hash($mdp, PASSWORD_DEFAULT);
+            } else {
+                $_SESSION['msg'] = 'Les mots de passe ne correspondent pas';
+                return $this->render('inscription', ['error' => $_SESSION['msg']]);
+            };
+            $user = new users(
+                $username,
+                $hash,
+                $telephone,
+                $num_pav,
+                $auth
+            );
+            $bdd = new UsersBDD();
+            $success = $bdd->inscription($user);
+            if ($success) {
+                $_SESSION['msg'] = 'Inscription réussie';
+                return $this->render('inscription', ['success' => $_SESSION['msg']]);
+            } else {
+                $_SESSION['msg'] = 'Erreur lors de l\'inscription';
+                return $this->render('inscription', ['error' => $_SESSION['msg']]);
+            }
         }
-        $auth=null;
-        $user = new users(
-            $input['username'],
-            $input['mdp'],
-            $input['telephone'],
-            $input['num_pav'],
-            $auth
-        );
-
-        $bdd = new UsersBDD();
-        $success = $bdd->inscription($user);
-
-        if ($success) {
-            return $this->sendJson(['status' => 'inscription réussie'], 201);
-        } else {
-            return $this->sendJson(['error' => 'Échec de l\'inscription'], 500);
-        }
+        $this->render('inscription');
     }
 
-public function login() {
-    header("Access-Control-Allow-Origin: POST");
-    $input = json_decode(file_get_contents('php://input'), true);
-    $bdd = new UsersBDD();
+    // Connexion
+    public function login()
+    {
+        $bdd = new UsersBDD();
 
-    // 🔁 Connexion par token si fourni
-    if (isset($input['token'])) {
-        $result = $bdd->getUserByToken($input['token']); // méthode à créer dans UsersBDD
+        // 🔁 Connexion par token si fourni
+        if (isset($input['token'])) {
+            $result = $bdd->getUserByToken($input['token']); // méthode à créer dans UsersBDD
+            if ($result) {
+                $user = $result['users'];
+                return $this->sendJson([
+                    'status' => 'success',
+                    'users_id' => $result['users_id'],
+                    'username' => $user->getUsername(),
+                    'telephone' => $user->getTelephone(),
+                    'numero_personne_rev' => $user->numero_peronne_rev(),
+                    'token' => $user->get_Token()
+                ]);
+            } else {
+                return $this->sendJson(['error' => 'Token invalide'], 401);
+            }
+        }
+
+        // 🔐 Connexion classique
+        if (!isset($input['telephone'], $input['mdp'])) {
+            return $this->sendJson(['error' => 'Téléphone et mot de passe requis'], 400);
+        }
+
+        $result = $bdd->login($input['telephone'], $input['mdp']);
+
         if ($result) {
             $user = $result['users'];
+
+            // ✅ Générer un nouveau token
+            $token = bin2hex(random_bytes(32));
+
+            $bdd->updateToken($result['users_id'], $token); // méthode à créer
+
             return $this->sendJson([
                 'status' => 'success',
                 'users_id' => $result['users_id'],
                 'username' => $user->getUsername(),
                 'telephone' => $user->getTelephone(),
                 'numero_personne_rev' => $user->numero_peronne_rev(),
-                'token' => $user->get_Token()
+                'auth_token' => $token
             ]);
         } else {
-            return $this->sendJson(['error' => 'Token invalide'], 401);
+            return $this->sendJson(['error' => 'Identifiants invalides'], 401);
         }
     }
 
-    // 🔐 Connexion classique
-    if (!isset($input['telephone'], $input['mdp'])) {
-        return $this->sendJson(['error' => 'Téléphone et mot de passe requis'], 400);
-    }
 
-    $result = $bdd->login($input['telephone'], $input['mdp']);
-
-    if ($result) {
-        $user = $result['users'];
-
-        // ✅ Générer un nouveau token
-        $token = bin2hex(random_bytes(32));
-     
-        $bdd->updateToken($result['users_id'], $token); // méthode à créer
-
-        return $this->sendJson([
-            'status' => 'success',
-            'users_id' => $result['users_id'],
-            'username' => $user->getUsername(),
-            'telephone' => $user->getTelephone(),
-            'numero_personne_rev' => $user->numero_peronne_rev(),
-            'auth_token' => $token
-        ]);
-    } else {
-        return $this->sendJson(['error' => 'Identifiants invalides'], 401);
-    }
-}
-
-
-    public function autoLogin() {
+    public function autoLogin()
+    {
         header("Access-Control-Allow-Origin: GET");
         $bdd = new UsersBDD();
         $result = $bdd->autoLogin();
@@ -104,14 +116,15 @@ public function login() {
         }
     }
 
-    public function monProfil() {
+    public function monProfil()
+    {
         header("Access-Control-Allow-Origin: GET");
         /*
         if (!isset($_GET['id'])) {
             return $this->sendJson(['error' => 'ID utilisateur manquant'], 400);
         }
             */
-        $id= 1;
+        $id = 1;
 
         $bdd = new UsersBDD();
         $result = $bdd->mon_profil_utilisateur($id);
@@ -127,17 +140,7 @@ public function login() {
                 'token' => $user->get_Token()
             ]);
         } else {
-            return $this->sendJson(['error' => 'Utilisateur non trouvé'], 404);
+            return $result;
         }
     }
-
-    // Méthode utilitaire JSON
-    private function sendJson($data, $status = 200) {
-        http_response_code($status);
-        header("Access-Control-Allow-Origin: *");
-        header("Content-Type: application/json");
-        echo json_encode($data);
-        exit;
-    
-}
 }

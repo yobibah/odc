@@ -15,6 +15,15 @@ abstract class Controllers
         header("Location: $url");
         exit();
     }
+    // Méthode utilitaire JSON
+    protected function sendJson($data, $status = 200)
+    {
+        http_response_code($status);
+        header("Access-Control-Allow-Origin: *");
+        header("Content-Type: application/json");
+        echo json_encode($data);
+        exit();
+    }
 }
 
 ?>

@@ -188,15 +188,6 @@ class CliniqueControllers extends Controllers
         }, $results)
         ;
 
-        return $this->sendJson($data);
-    }
-
-    private function sendJson($data, $status = 200)
-    {
-        http_response_code($status);
-        header("Access-Control-Allow-Origin: *");
-        header("Content-Type: application/json");
-        echo json_encode($data);
-        exit;
+        return $this->render('clinique', ['data' => $data]);
     }
 }
