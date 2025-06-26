@@ -43,59 +43,60 @@ class UsersControllers extends HomeControllers
         $this->render('inscription');
     }
 
+    public function requireAuth()
+    {
+        if (!isset($_SESSION['token'])) {
+            return $this->redirect('login');
+        }
+    }
+
     // Connexion
     public function login()
     {
         $bdd = new UsersBDD();
 
         // 🔁 Connexion par token si fourni
-        if (isset($input['token'])) {
-            $result = $bdd->getUserByToken($input['token']); // méthode à créer dans UsersBDD
+        if (isset($_SESSION['token'])) {
+            $result = $bdd->getUserByToken($_SESSION['token']);
             if ($result) {
                 $user = $result['users'];
-                return $this->sendJson([
-                    'status' => 'success',
-                    'users_id' => $result['users_id'],
-                    'username' => $user->getUsername(),
-                    'telephone' => $user->getTelephone(),
-                    'numero_personne_rev' => $user->numero_peronne_rev(),
-                    'token' => $user->get_Token()
-                ]);
+                $userid = $result['users_id'];
+                return $this->render('profil',
+                    [
+                        'user' => $user,
+                        'userid' => $userid
+                    ]
+                );
             } else {
-                return $this->sendJson(['error' => 'Token invalide'], 401);
+                unset($_SESSION['token']); // Supprimer le token invalide
+                return $this->redirect('login');
             }
         }
-
         // 🔐 Connexion classique
-        if (!isset($input['telephone'], $input['mdp'])) {
-            return $this->sendJson(['error' => 'Téléphone et mot de passe requis'], 400);
-        }
-
-        $result = $bdd->login($input['telephone'], $input['mdp']);
-
-        if ($result) {
-            $user = $result['users'];
-
-            // ✅ Générer un nouveau token
-            $token = bin2hex(random_bytes(32));
-
-            $bdd->updateToken($result['users_id'], $token); // méthode à créer
-
-            return $this->sendJson([
-                'status' => 'success',
-                'users_id' => $result['users_id'],
-                'username' => $user->getUsername(),
-                'telephone' => $user->getTelephone(),
-                'numero_personne_rev' => $user->numero_peronne_rev(),
-                'auth_token' => $token
-            ]);
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $username = isset(htmlspecialchars($_POST['username'])) ? htmlspecialchars($_POST['username']) : null;
+            $mdp = isset(htmlspecialchars($_POST['mdp'])) ? htmlspecialchars($_POST['mdp']) : null;
+            $result = $bdd->login($username, $mdp);
+            if ($result) {
+                // ✅ Générer un nouveau token
+                $token = bin2hex(random_bytes(32));
+                $bdd->updateToken($result['users_id'], $token);
+                $user = $result['users'];
+                $_SESSION['msg'] = 'Connexion réussie';
+                $_SESSION['token'] = $token; // Stocker le token dans la session
+                $_SESSION['username'] = $user->getUsername();
+                $_SESSION['telephone'] = $user->getTelephone();;
+                return $this->requireAuth();
+            } else {
+                $_SESSION['msg'] = 'Identifiants invalides';
+                return $this->redirect('login');
+            }
         } else {
-            return $this->sendJson(['error' => 'Identifiants invalides'], 401);
+            return $this->redirect('login');
         }
     }
 
-
-    public function autoLogin()
+    /*   public function autoLogin()
     {
         header("Access-Control-Allow-Origin: GET");
         $bdd = new UsersBDD();
@@ -112,22 +113,16 @@ class UsersControllers extends HomeControllers
                 'token' => $user->get_Token()
             ]);
         } else {
-            return $this->sendJson(['status' => 'not_connected']);
+            return $this->render('login');
         }
     }
-
+*/
     public function monProfil()
     {
-        header("Access-Control-Allow-Origin: GET");
-        /*
-        if (!isset($_GET['id'])) {
-            return $this->sendJson(['error' => 'ID utilisateur manquant'], 400);
-        }
-            */
-        $id = 1;
+        $this->requireAuth();
 
         $bdd = new UsersBDD();
-        $result = $bdd->mon_profil_utilisateur($id);
+        $result = $bdd->mon_profil_utilisateur($_SESSION['user_id']);
 
         if ($result) {
             $user = $result['users'];
