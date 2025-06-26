@@ -6,3 +6,6 @@
     <title><?= isset($data['title']) ? htmlspecialchars($data['title']) : '' ?> | <?= isset($data['content']) ? htmlspecialchars($data['content']) : '' ?></title>
 </head>
 <body>
+    <header>
+        <?php require_once __DIR__ . '/../layout/navbar.php'; ?>
+    </header>

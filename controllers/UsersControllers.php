@@ -33,6 +33,7 @@ class UsersControllers extends HomeControllers
             $bdd = new UsersBDD();
             $success = $bdd->inscription($user);
             if ($success) {
+                $bdd->record($success['users_id'] ?? 0, date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
                 $_SESSION['msg'] = 'Inscription réussie';
                 return $this->render('auth/login', ['success' => $_SESSION['msg']]);
             } else {

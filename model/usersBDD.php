@@ -14,7 +14,15 @@ class UsersBDD extends Users
     {
         $this->pdo = Config::getpdo()->getconnexion();
     }
-
+    public function record($id, $time, $ip_adress )
+    {
+        $sql = "INSERT INTO login (user_id, time, ip_adress) VALUES (:user_id, :time, :ip_adress)";
+        $stm = $this->pdo->prepare($sql);
+        $stm->bindValue(':user_id', $id, PDO::PARAM_INT);
+        $stm->bindValue(':time', $time, PDO::PARAM_STR);
+        $stm->bindValue(':ip_adress', $ip_adress, PDO::PARAM_STR);
+        return $stm->execute();
+    }
     public function login($username, $mdp)
     {
         $sql = "SELECT * FROM users WHERE username = :username";
@@ -23,7 +31,6 @@ class UsersBDD extends Users
 
         if ($stmt->execute()) {
             $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
             if (count($resultats) > 0) {
                 foreach ($resultats as $rs) {
                     if (password_verify($mdp, $rs['mdp'])) {
