@@ -69,7 +69,7 @@ class UsersControllers extends HomeControllers
                 );
             } else {
                 unset($_SESSION['token']); // Supprimer le token invalide
-                return $this->redirect('login');
+                return $this->requireAuth();
             }
         }
         // 🔐 Connexion classique
@@ -85,14 +85,19 @@ class UsersControllers extends HomeControllers
                 $_SESSION['msg'] = 'Connexion réussie';
                 $_SESSION['token'] = $token; // Stocker le token dans la session
                 $_SESSION['username'] = $user->getUsername();
-                $_SESSION['telephone'] = $user->getTelephone();;
-                return $this->requireAuth();
+                $_SESSION['telephone'] = $user->getTelephone();
+                return $this->render('profil',
+                    [
+                        'user' => $user,
+                        'userid' => $result['users_id']
+                    ]
+                );
             } else {
                 $_SESSION['msg'] = 'Identifiants invalides';
-                return $this->redirect('login');
+                return $this->requireAuth();
             }
         } else {
-            return $this->redirect('login');
+            return $this->requireAuth();
         }
     }
 
@@ -120,22 +125,20 @@ class UsersControllers extends HomeControllers
     public function monProfil()
     {
         $this->requireAuth();
-
         $bdd = new UsersBDD();
         $result = $bdd->mon_profil_utilisateur($_SESSION['user_id']);
 
         if ($result) {
             $user = $result['users'];
-            return $this->sendJson([
-                'status' => 'ok',
-                'id_users' => $result['users_id'],
-                'username' => $user->getUsername(),
-                'telephone' => $user->getTelephone(),
-                'numero_personne_rev' => $user->numero_peronne_rev(),
-                'token' => $user->get_Token()
-            ]);
+            return $this->render('profil',
+                [
+                    'user' => $user,
+                    'userid' => $result['users_id']
+                ]
+            );
         } else {
-            return $result;
+            $_SESSION['msg'] = 'Utilisateur non trouvé';
+            return $this->render('profil');
         }
     }
 }
