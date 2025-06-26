@@ -43,7 +43,7 @@ $router->register('/ipn/paiement', ['controllers\IpnControllers', 'test']);
 
 
 
-$router->register('/nouveau-client', ['controllers\UsersControllers', 'inscription']);
+$router->register('/register', ['controllers\UsersControllers', 'inscription']);
 $router->register('/mon-profil', ['controllers\UsersControllers', 'monProfil']);
 $router->register('/login', ['controllers\UsersControllers', 'login']);
 $router->register('/logout', ['controllers\UsersControllers', 'logout']);

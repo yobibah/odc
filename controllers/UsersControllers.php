@@ -10,18 +10,18 @@ class UsersControllers extends HomeControllers
     //inscription
     public function inscription()
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $username = htmlspecialchars($_POST['username']) ? htmlspecialchars($_POST['username']) : null;
-            $mdp = htmlspecialchars($_POST['mdp']) ? htmlspecialchars($_POST['mdp']) : null;
-            $mdp2 = htmlspecialchars($_POST['mdp2']) ? htmlspecialchars($_POST['mdp2']) : null;
-            $telephone = htmlspecialchars($_POST['telephone']) ? htmlspecialchars($_POST['telephone']) : null;
-            $num_pav = htmlspecialchars($_POST['num_pav']) ? htmlspecialchars($_POST['num_pav']) : null;
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = isset($_POST['username']) ? htmlspecialchars($_POST['username']) : null;
+            $mdp = isset($_POST['mdp']) ? htmlspecialchars($_POST['mdp']) : null;
+            $mdp2 = isset($_POST['mdp2']) ? htmlspecialchars($_POST['mdp2']) : null;
+            $telephone = isset($_POST['telephone']) ? htmlspecialchars($_POST['telephone']) : null;
+            $num_pav = isset($_POST['num_pav']) ? htmlspecialchars($_POST['num_pav']) : null;
             $auth = null;
             if ($mdp === $mdp2) {
                 $hash = password_hash($mdp, PASSWORD_DEFAULT);
             } else {
                 $_SESSION['msg'] = 'Les mots de passe ne correspondent pas';
-                return $this->render('inscription', ['error' => $_SESSION['msg']]);
+                return $this->render('auth/inscription', ['error' => $_SESSION['msg']]);
             };
             $user = new users(
                 $username,
@@ -34,13 +34,17 @@ class UsersControllers extends HomeControllers
             $success = $bdd->inscription($user);
             if ($success) {
                 $_SESSION['msg'] = 'Inscription réussie';
-                return $this->render('inscription', ['success' => $_SESSION['msg']]);
+                return $this->render('auth/login', ['success' => $_SESSION['msg']]);
             } else {
                 $_SESSION['msg'] = 'Erreur lors de l\'inscription';
-                return $this->render('inscription', ['error' => $_SESSION['msg']]);
+                return $this->render('auth/inscription', ['error' => $_SESSION['msg']]);
             }
         }
-        $this->render('inscription');
+        $this->render('auth/inscription'
+            , [
+                'title' => 'Inscription',
+                'content' => 'Veuillez vous inscrire'
+            ]);
     }
 
     public function requireAuth()
@@ -74,16 +78,14 @@ class UsersControllers extends HomeControllers
         }
         // 🔐 Connexion classique
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = htmlspecialchars($_POST['username']) ? htmlspecialchars($_POST['username']) : null;
-            $mdp = htmlspecialchars($_POST['mdp']) ? htmlspecialchars($_POST['mdp']) : null;
+            $username = isset($_POST['username']) ? htmlspecialchars($_POST['username']) : null;
+            $mdp = isset($_POST['mdp']) ? htmlspecialchars($_POST['mdp']) : null;
             $result = $bdd->login($username, $mdp);
             if ($result) {
                 // ✅ Générer un nouveau token
-                $token = bin2hex(random_bytes(32));
-                $bdd->updateToken($result['users_id'], $token);
                 $user = $result['users'];
                 $_SESSION['msg'] = 'Connexion réussie';
-                $_SESSION['token'] = $token; // Stocker le token dans la session
+                $_SESSION['token'] = $user->get_Token(); // Stocker le token dans la session
                 $_SESSION['username'] = $user->getUsername();
                 $_SESSION['telephone'] = $user->getTelephone();
                 return $this->render('profil',
@@ -97,7 +99,11 @@ class UsersControllers extends HomeControllers
                 return $this->render('auth/login', ['error' => $_SESSION['msg']]);
             }
         } else {
-            return $this->render('auth/login');
+            return $this->render('auth/login'
+                , [
+                    'title' => 'Connexion',
+                    'content' => 'Veuillez vous connecter'
+                ]);
         }
     }
 
