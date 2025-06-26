@@ -21,7 +21,12 @@ class UsersControllers extends HomeControllers
                 $hash = password_hash($mdp, PASSWORD_DEFAULT);
             } else {
                 $_SESSION['msg'] = 'Les mots de passe ne correspondent pas';
-                return $this->render('auth/inscription', ['error' => $_SESSION['msg']]);
+                return $this->render('auth/inscription', 
+                [
+                    'error' => $_SESSION['msg'],
+                    'title' => 'Inscription échouée',
+                    'content' => 'Veuillez corriger les erreurs ci-dessus.'
+                ]);
             };
             $user = new users(
                 $username,
@@ -35,10 +40,20 @@ class UsersControllers extends HomeControllers
             if ($success) {
                 $bdd->record($success['users_id'] ?? 0, date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
                 $_SESSION['msg'] = 'Inscription réussie';
-                return $this->render('auth/login', ['success' => $_SESSION['msg']]);
+                return $this->render('auth/login',
+                [
+                    'success' => $_SESSION['msg'],
+                    'title' => 'Connexion réussie',
+                    'content' => 'Vous êtes maintenant connecté.'
+                ]);
             } else {
                 $_SESSION['msg'] = 'Erreur lors de l\'inscription';
-                return $this->render('auth/inscription', ['error' => $_SESSION['msg']]);
+                return $this->render('auth/inscription', 
+                [
+                    'error' => $_SESSION['msg'],
+                    'title' => 'Inscription échouée',
+                    'content' => 'Veuillez corriger les erreurs ci-dessus.'
+                ]);
             }
         }
         $this->render('auth/inscription'
@@ -66,12 +81,8 @@ class UsersControllers extends HomeControllers
             if ($result) {
                 $user = $result['users'];
                 $userid = $result['users_id'];
-                return $this->render('profil',
-                    [
-                        'user' => $user,
-                        'userid' => $userid
-                    ]
-                );
+                $bdd->record($userid, date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
+                return $this->monProfil($userid);
             } else {
                 unset($_SESSION['token']); // Supprimer le token invalide
                 return $this->requireAuth();
@@ -89,15 +100,16 @@ class UsersControllers extends HomeControllers
                 $_SESSION['token'] = $user->get_Token(); // Stocker le token dans la session
                 $_SESSION['username'] = $user->getUsername();
                 $_SESSION['telephone'] = $user->getTelephone();
-                return $this->render('profil',
-                    [
-                        'user' => $user,
-                        'userid' => $result['users_id']
-                    ]
-                );
+                $bdd->record($result['users_id'], date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
+                return $this->monProfil($result['users_id']);
             } else {
                 $_SESSION['msg'] = 'Identifiants invalides';
-                return $this->render('auth/login', ['error' => $_SESSION['msg']]);
+                return $this->render('auth/login', 
+                [
+                    'error' => $_SESSION['msg'],
+                    'title' => 'Connexion échouée',
+                    'content' => 'Veuillez vérifier vos identifiants et réessayer.'
+                ]);
             }
         } else {
             return $this->render('auth/login'
@@ -129,23 +141,29 @@ class UsersControllers extends HomeControllers
         }
     }
 */
-    public function monProfil()
+    public function monProfil($userid)
     {
         $this->requireAuth();
         $bdd = new UsersBDD();
-        $result = $bdd->mon_profil_utilisateur($_SESSION['user_id']);
-
+        $result = $bdd->mon_profil_utilisateur($userid);
         if ($result) {
             $user = $result['users'];
             return $this->render('profil',
                 [
                     'user' => $user,
-                    'userid' => $result['users_id']
+                    'userid' => $result['users_id'],
+                    'title' => 'Mon Profil',
+                    'content' => 'Voici vos informations de profil.'
                 ]
             );
         } else {
             $_SESSION['msg'] = 'Utilisateur non trouvé';
-            return $this->render('profil');
+            return $this->render('profil'
+                , [
+                    'error' => $_SESSION['msg'],
+                    'title' => 'Profil non trouvé',
+                    'content' => 'Aucun profil trouvé pour cet utilisateur.'
+                ]);
         }
     }
 }

@@ -39,7 +39,7 @@ class UsersBDD extends Users
                         setcookie('auth_token', $token, time() + (86400 * 7), "/", "", false, true);
                         return [
                             'users_id' => $rs['users_id'],
-                            'users' => new Users($rs['username'], $rs['mdp'], $rs['username'], $rs['ps_cas'], $rs['auth_token'])
+                            'users' => new Users($rs['username'], $rs['mdp'], $rs['telephone'], $rs['num_pav'], $rs['auth_token'])
                         ];
                     }
                 }
@@ -124,7 +124,7 @@ class UsersBDD extends Users
                 $row['username'],
                 $row['mdp'],
                 $row['telephone'],
-                $row['numero_personne_rev'],
+                $row['num_pav'],
                 $row['auth_token']
             );
             return ['users_id' => $row['users_id'], 'users' => $user];
