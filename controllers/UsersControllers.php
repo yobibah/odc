@@ -35,7 +35,7 @@ class UsersControllers extends HomeControllers
                 $nom,
                 $prenom,
                 $telephone,
-                $mdp,
+                $hash,
                 date('Y-m-d H:i:s'),
                 $role,
                 $auth
@@ -85,14 +85,54 @@ class UsersControllers extends HomeControllers
     {
         $bdd = new UsersBDD();
 
+        // Fonction pour initialiser la session et rediriger selon le rôle
+        $handleLogin = function($result) {
+            $user = $result['users'];
+            $_SESSION['msg'] = 'Connexion réussie';
+            $_SESSION['token'] = $user->getAuthToken();
+            $_SESSION['nom'] = $user->getNom();
+            $_SESSION['telephone'] = $user->getTelephone();
+            $_SESSION['user_id'] = $result['users_id'];
+            session_regenerate_id(true);
+            switch ($user->getRole()) {
+                case 'admin':
+                    $_SESSION['admin'] = true;
+                    $this->record($_SESSION['user_id'], 'new login');
+                    return $this->render('admin/dashboard', [
+                        'title' => 'Tableau de bord Admin',
+                        'content' => 'Bienvenue sur le tableau de bord administrateur.',
+                        'user' => $user,
+                    ]);
+                case 'patient':
+                    $_SESSION['patient'] = true;
+                    $this->record($_SESSION['user_id'], 'new login');
+                    return $this->render('patient/dashboard', [
+                        'title' => 'Tableau de bord Patient',
+                        'content' => 'Bienvenue sur le tableau de bord patient.',
+                        'user' => $user
+                    ]);
+                case 'medecin':
+                    $_SESSION['medecin'] = true;
+                    $this->record($_SESSION['user_id'], 'new login');
+                    return $this->render('medecin/dashboard', [
+                        'title' => 'Tableau de bord Médecin',
+                        'content' => 'Bienvenue sur le tableau de bord médecin.',
+                        'user' => $user
+                    ]);
+                default:
+                    // Actions par défaut
+                    return $this->render('auth/login', [
+                        'title' => 'Connexion',
+                        'content' => 'Veuillez vous connecter'
+                    ]);
+            }
+        };
+
         // 🔁 Connexion par token si fourni
         if (isset($_SESSION['token']) || !empty($_COOKIE['token'])) {
             $result = $bdd->getUserByToken($_SESSION['token'] ?? $_COOKIE['token']);
             if ($result) {
-                $user = $result['users'];
-                $userid = $result['users_id'];
-                $this->record($userid, 'login');
-                return $this->monProfil($userid);
+                return $handleLogin($result);
             } else {
                 unset($_SESSION['token']);
                 unset($_COOKIE['token']);
@@ -106,49 +146,7 @@ class UsersControllers extends HomeControllers
             $mdp = isset($_POST['mdp']) ? htmlspecialchars($_POST['mdp']) : null;
             $result = $bdd->login($telephone, $mdp);
             if ($result) {
-                // ✅ Générer un nouveau token
-                $user = $result['users'];
-                $_SESSION['msg'] = 'Connexion réussie';
-                $_SESSION['token'] = $user->getAuthToken(); // Stocker le token dans la session
-                $_SESSION['nom'] = $user->getNom();
-                $_SESSION['telephone'] = $user->getTelephone();
-                $_SESSION['user_id'] = $result['users_id'];
-                switch ($user->getRole()) {
-                    case 'admin':
-                        // Actions spécifiques pour les administrateurs
-                        $_SESSION['admin'] = true;
-                        $this->record($_SESSION['user_id'], 'new login');
-                        return $this->render('admin/dashboard', [
-                            'title' => 'Tableau de bord Admin',
-                            'content' => 'Bienvenue sur le tableau de bord administrateur.',
-                            'user' => $user,
-                        ]);
-                        break;
-                    case 'patient':
-                        // Actions spécifiques pour les patients
-                        $_SESSION['patient'] = true;
-                        $this->record($_SESSION['user_id'], 'new login');
-                        return $this->render('patient/dashboard'
-                        , [
-                            'title' => 'Tableau de bord Patient',
-                            'content' => 'Bienvenue sur le tableau de bord patient.',
-                            'user' => $user
-                        ]);
-                        break;
-                    case 'medecin':
-                        // Actions spécifiques pour les médecins
-                        $_SESSION['medecin'] = true;
-                        $this->record($_SESSION['user_id'], 'new login');
-                        return $this->render('medecin/dashboard', [
-                            'title' => 'Tableau de bord Médecin',
-                            'content' => 'Bienvenue sur le tableau de bord médecin.',
-                            'user' => $user
-                        ]);
-                        break;
-                    default:
-                        // Actions par défaut
-                        break;
-                }
+                return $handleLogin($result);
             } else {
                 $_SESSION['msg'] = 'Identifiants invalides';
                 return $this->render(
