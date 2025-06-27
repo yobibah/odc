@@ -1,4 +1,4 @@
- <?php require_once __DIR__ . '/../layout/header.php'; ?>
+<?php require_once VIEW_PATH.'/layout/header.php'; ?>
  <div class="login-container">
         <h2>Connexion</h2>
         <?php if (isset($_SESSION['msg'])) : ?>

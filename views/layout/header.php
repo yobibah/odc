@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= isset($data['title']) ? htmlspecialchars($data['title']) : '' ?> | <?= isset($data['content']) ? htmlspecialchars($data['content']) : '' ?></title>
+    <title><?php echo isset($data['title']) ? htmlspecialchars($data['title']) : '' ?> | <?php echo isset($data['content']) ? htmlspecialchars($data['content']) : '' ?></title>
 </head>
 <body>
     <header>
-        <?php require_once __DIR__ . '/../layout/navbar.php'; ?>
+       <?php require_once VIEW_PATH.'/layout/navbar.php'; ?>
     </header>

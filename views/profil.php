@@ -1,1 +1,1 @@
- <?php require_once __DIR__ . '/layout/header.php'; ?>
+<?php require_once VIEW_PATH.'/layout/header.php'; ?>
