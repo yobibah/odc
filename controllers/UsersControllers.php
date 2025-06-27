@@ -11,11 +11,12 @@ class UsersControllers extends HomeControllers
     public function inscription()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = isset($_POST['username']) ? htmlspecialchars($_POST['username']) : null;
+            $nom = isset($_POST['nom']) ? htmlspecialchars($_POST['nom']) : null;
+            $prenom = isset($_POST['prenom']) ? htmlspecialchars($_POST['prenom']) : null;
+            $telephone = isset($_POST['telephone']) ? htmlspecialchars($_POST['telephone']) : null;
             $mdp = isset($_POST['mdp']) ? htmlspecialchars($_POST['mdp']) : null;
             $mdp2 = isset($_POST['mdp2']) ? htmlspecialchars($_POST['mdp2']) : null;
-            $telephone = isset($_POST['telephone']) ? htmlspecialchars($_POST['telephone']) : null;
-            $num_pav = isset($_POST['num_pav']) ? htmlspecialchars($_POST['num_pav']) : null;
+            $role = isset($_POST['role']) ? htmlspecialchars($_POST['role']) : 'medecin'; // Par défaut, le rôle est 'medecin'
             $auth = null;
             if ($mdp === $mdp2) {
                 $hash = password_hash($mdp, PASSWORD_DEFAULT);
@@ -29,10 +30,12 @@ class UsersControllers extends HomeControllers
                 ]);
             };
             $user = new users(
-                $username,
-                $hash,
+                $nom,
+                $prenom,
                 $telephone,
-                $num_pav,
+                $mdp,
+                date('Y-m-d H:i:s'),
+                $role,
                 $auth
             );
             $bdd = new UsersBDD();
@@ -90,15 +93,15 @@ class UsersControllers extends HomeControllers
         }
         // 🔐 Connexion classique
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = isset($_POST['username']) ? htmlspecialchars($_POST['username']) : null;
+            $telephone = isset($_POST['telephone']) ? htmlspecialchars($_POST['telephone']) : null;
             $mdp = isset($_POST['mdp']) ? htmlspecialchars($_POST['mdp']) : null;
-            $result = $bdd->login($username, $mdp);
+            $result = $bdd->login($telephone, $mdp);
             if ($result) {
                 // ✅ Générer un nouveau token
                 $user = $result['users'];
                 $_SESSION['msg'] = 'Connexion réussie';
-                $_SESSION['token'] = $user->get_Token(); // Stocker le token dans la session
-                $_SESSION['username'] = $user->getUsername();
+                $_SESSION['token'] = $user->getAuthToken(); // Stocker le token dans la session
+                $_SESSION['nom'] = $user->getNom();
                 $_SESSION['telephone'] = $user->getTelephone();
                 $bdd->record($result['users_id'], date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
                 return $this->monProfil($result['users_id']);

@@ -7,49 +7,44 @@ use model\users;
 class patients extends users
 {
 
-    private $nom;
-    private $prenom;
     private $date_naissance;
     private $sexe;
+    private $groupe_sanguine;
     private $adresse;
 
 
     public function __construct(
+        $nom,
+        $prenom,
         $telephone,
-        $numero_peronne_rev,
-        string $nom,
-        string $prenom,
+        $password,
+        $date_creation,
+        $role,
         string $date_naissance,
         string $sexe,
+        string $groupe_sanguine,
         string $adresse
     ) {
-        parent::__construct(null, null, $telephone, $numero_peronne_rev, null);
+        parent::__construct($nom, $prenom, $telephone, $password, $date_creation, $role);
 
-        $this->nom = $nom;
-        $this->prenom = $prenom;
         $this->date_naissance = $date_naissance;
         $this->sexe = $sexe;
+        $this->groupe_sanguine = $groupe_sanguine;
         $this->adresse = $adresse;
     }
 
     // Getters and Setters
 
 
-
-    public function getNom(): string
-    {
-        return $this->nom;
-    }
-
-    public function getPrenom(): string
-    {
-        return $this->prenom;
-    }
-
     public function getDateNaissance(): string
     {
         return $this->date_naissance;
     }
+    public function getGroupeSanguine(): string
+    {
+        return $this->groupe_sanguine;
+    }
+
 
     public function getSexe(): string
     {
@@ -60,17 +55,9 @@ class patients extends users
     {
         return $this->adresse;
     }
-
-
-
-    public function setNom(string $nom): void
+    public function setGroupeSanguine(string $groupe_sanguine): void
     {
-        $this->nom = $nom;
-    }
-
-    public function setPrenom(string $prenom): void
-    {
-        $this->prenom = $prenom;
+        $this->groupe_sanguine = $groupe_sanguine;
     }
 
     public function setDateNaissance(string $date_naissance): void

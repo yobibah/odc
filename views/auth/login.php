@@ -17,4 +17,4 @@
         </form>
         <p>Pas encore de compte ? <a href="/register">Inscrivez-vous</a></p>
     </div>
- 
+ <?php require_once VIEW_PATH.'/layout/footer.php'; ?>

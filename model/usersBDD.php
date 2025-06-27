@@ -23,11 +23,11 @@ class UsersBDD extends Users
         $stm->bindValue(':ip_adress', $ip_adress, PDO::PARAM_STR);
         return $stm->execute();
     }
-    public function login($username, $mdp)
+    public function login($telephone, $mdp)
     {
-        $sql = "SELECT * FROM users WHERE username = :username";
+        $sql = "SELECT * FROM users WHERE telephone = :telephone";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindValue(':username', $username, PDO::PARAM_STR);
+        $stmt->bindValue(':telephone', $telephone, PDO::PARAM_STR);
 
         if ($stmt->execute()) {
             $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -39,7 +39,7 @@ class UsersBDD extends Users
                         setcookie('auth_token', $token, time() + (86400 * 7), "/", "", false, true);
                         return [
                             'users_id' => $rs['users_id'],
-                            'users' => new Users($rs['username'], $rs['mdp'], $rs['telephone'], $rs['num_pav'], $rs['auth_token'])
+                            'users' => new Users($rs['nom'], $rs['prenom'], $rs['telephone'], $rs['mdp'], $rs['date_creation'], $rs['role'], $rs['auth_token'])
                         ];
                     }
                 }
@@ -49,17 +49,19 @@ class UsersBDD extends Users
     }
     public function inscription(Users $users)
     {
-        $sql = "INSERT INTO users (username,mdp,telephone,num_pav) VALUES(:username,:mdp,:telephone,:num_pav)";
+        $sql = "INSERT INTO users (nom,prenom,mdp,telephone,date_creation,role) VALUES(:nom,:prenom,:mdp,:telephone,:date_creation,:role)";
         $smt = $this->pdo->prepare($sql);
         return $smt->execute([
-            ':username' => $users->getusername(),
+            ':nom' => $users->getNom(),
+            ':prenom' => $users->getPrenom(),
             ':mdp' => $users->getPassword(),
             ':telephone' => $users->getTelephone(),
-            ':num_pav' => $users->numero_peronne_rev()
+            ':date_creation' => $users->getDateCreation(),
+            ':role' => $users->getRole(),
         ]);
     }
 
-    public function autoLogin()
+ /*   public function autoLogin()
     {
         if (!isset($_COOKIE['auth_token'])) {
             return null;
@@ -84,7 +86,7 @@ class UsersBDD extends Users
         return null;
     }
 
-
+*/
     public function mon_profil_utilisateur($users_id)
     {
         $sql = "SELECT * FROM users WHERE users_id = :users_id";
@@ -97,7 +99,7 @@ class UsersBDD extends Users
                 foreach ($resultats as $rs) {
                     return [
                         'users_id' => $rs['users_id'],
-                        'users' => new users($rs['username'], $rs['mdp'], $rs['telephone'], $rs['num_pav'], $rs['auth_token'])
+                        'users' => new users($rs['nom'], $rs['prenom'], $rs['telephone'], $rs['mdp'], $rs['date_creation'], $rs['role'], $rs['auth_token'])
                     ];
                 }
             }
@@ -121,10 +123,12 @@ class UsersBDD extends Users
 
         if ($row) {
             $user = new users(
-                $row['username'],
-                $row['mdp'],
+                $row['nom'],
+                $row['prenom'],
                 $row['telephone'],
-                $row['num_pav'],
+                $row['mdp'],
+                $row['date_creation'],
+                $row['role'],
                 $row['auth_token']
             );
             return ['users_id' => $row['users_id'], 'users' => $user];

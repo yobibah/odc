@@ -29,3 +29,4 @@
       </form>
       <p>Déjà un compte ? <a href="/login">Connectez-vous</a></p>
   </div>
+  <?php require_once VIEW_PATH.'/layout/footer.php'; ?>

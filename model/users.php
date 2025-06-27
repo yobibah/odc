@@ -2,22 +2,30 @@
 namespace model;
 class users{
     
-    public $username;
-    public $password;
+    private $nom;
+    private $prenom;
     private $telephone;
-    private $numero_peronne_rev;
+    private $password;
+    private $date_creation;
+    private $role;
     private $auth_token;
 
-    public function __construct($username,$password,$telephone,$numero_peronne_rev,$auth_token){
-        $this->username=$username;
+    public function __construct($nom,$prenom,$telephone,$password,$date_creation,$role,$auth_token){
+        $this->nom=$nom;
+        $this->prenom=$prenom;
         $this->password=$password;
-        $this->numero_peronne_rev=$numero_peronne_rev;
+        $this->date_creation=$date_creation;
         $this->telephone=$telephone ;
+        $this->role=$role;
         $this->auth_token=$auth_token ;
     }
 
-    public function getusername(){
-        return $this->username;
+    public function getNom(){
+        return $this->nom;
+    }
+
+    public function getPrenom(){
+        return $this->prenom;
     }
 
     public function getPassword(){
@@ -27,12 +35,16 @@ class users{
     public function getTelephone(){
         return $this->telephone;
     }
-    
-    public function numero_peronne_rev(){
-        return $this->numero_peronne_rev;
+
+    public function getDateCreation(){
+        return $this->date_creation;
     }
 
-    public function get_Token(){
+    public function getRole(){
+        return $this->role;
+    }
+
+    public function getAuthToken(){
         return $this->auth_token ;
     }
 
