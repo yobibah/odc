@@ -6,16 +6,16 @@
       <?php endif; ?>
       <form action="/register" method="post">
           <div class="form-group">
-              <label for="username">Nom d'utilisateur :</label>
-              <input type="text" id="username" name="username" required>
+              <label for="nom">Nom :</label>
+              <input type="text" id="nom" name="nom" required>
           </div>
           <div class="form-group">
-              <label for="telephone">Téléphone :</label>
-              <input type="tel" id="telephone" name="telephone" required>
+              <label for="prenom">Prénom :</label>
+              <input type="text" id="prenom" name="prenom" required>
           </div>
           <div class="form-group">
-            <label for="num_pav">Numéro de pavillon :</label>
-            <input type="text" id="num_pav" name="num_pav" required>
+            <label for="telephone">Téléphone :</label>
+            <input type="text" id="telephone" name="telephone" required>
           </div>
           <div class="form-group">
               <label for="mdp">Mot de passe :</label>

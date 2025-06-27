@@ -22,12 +22,14 @@ class UsersControllers extends HomeControllers
                 $hash = password_hash($mdp, PASSWORD_DEFAULT);
             } else {
                 $_SESSION['msg'] = 'Les mots de passe ne correspondent pas';
-                return $this->render('auth/inscription', 
-                [
-                    'error' => $_SESSION['msg'],
-                    'title' => 'Inscription échouée',
-                    'content' => 'Veuillez corriger les erreurs ci-dessus.'
-                ]);
+                return $this->render(
+                    'auth/inscription',
+                    [
+                        'error' => $_SESSION['msg'],
+                        'title' => 'Inscription échouée',
+                        'content' => 'Veuillez corriger les erreurs ci-dessus.'
+                    ]
+                );
             };
             $user = new users(
                 $nom,
@@ -42,27 +44,33 @@ class UsersControllers extends HomeControllers
             $success = $bdd->inscription($user);
             if ($success) {
                 $_SESSION['msg'] = 'Inscription réussie';
-                return $this->render('auth/login',
-                [
-                    'success' => $_SESSION['msg'],
-                    'title' => 'Connexion réussie',
-                    'content' => 'Vous êtes maintenant connecté.'
-                ]);
+                return $this->render(
+                    'auth/login',
+                    [
+                        'success' => $_SESSION['msg'],
+                        'title' => 'Connexion réussie',
+                        'content' => 'Vous êtes maintenant connecté.'
+                    ]
+                );
             } else {
                 $_SESSION['msg'] = 'Erreur lors de l\'inscription';
-                return $this->render('auth/inscription', 
-                [
-                    'error' => $_SESSION['msg'],
-                    'title' => 'Inscription échouée',
-                    'content' => 'Veuillez corriger les erreurs ci-dessus.'
-                ]);
+                return $this->render(
+                    'auth/inscription',
+                    [
+                        'error' => $_SESSION['msg'],
+                        'title' => 'Inscription échouée',
+                        'content' => 'Veuillez corriger les erreurs ci-dessus.'
+                    ]
+                );
             }
         }
-        $this->render('auth/inscription'
-            , [
+        $this->render(
+            'auth/inscription',
+            [
                 'title' => 'Inscription',
                 'content' => 'Veuillez vous inscrire'
-            ]);
+            ]
+        );
     }
 
     public function requireAuth()
@@ -83,7 +91,7 @@ class UsersControllers extends HomeControllers
             if ($result) {
                 $user = $result['users'];
                 $userid = $result['users_id'];
-                $this->record('login');
+                $this->record($userid, 'login');
                 return $this->monProfil($userid);
             } else {
                 unset($_SESSION['token']);
@@ -105,23 +113,61 @@ class UsersControllers extends HomeControllers
                 $_SESSION['nom'] = $user->getNom();
                 $_SESSION['telephone'] = $user->getTelephone();
                 $_SESSION['user_id'] = $result['users_id'];
-                $this->record('new login');
-                return $this->monProfil($result['users_id']);
+                switch ($user->getRole()) {
+                    case 'admin':
+                        // Actions spécifiques pour les administrateurs
+                        $_SESSION['admin'] = true;
+                        $this->record($_SESSION['user_id'], 'new login');
+                        return $this->render('admin/dashboard', [
+                            'title' => 'Tableau de bord Admin',
+                            'content' => 'Bienvenue sur le tableau de bord administrateur.',
+                            'user' => $user,
+                        ]);
+                        break;
+                    case 'patient':
+                        // Actions spécifiques pour les patients
+                        $_SESSION['patient'] = true;
+                        $this->record($_SESSION['user_id'], 'new login');
+                        return $this->render('patient/dashboard'
+                        , [
+                            'title' => 'Tableau de bord Patient',
+                            'content' => 'Bienvenue sur le tableau de bord patient.',
+                            'user' => $user
+                        ]);
+                        break;
+                    case 'medecin':
+                        // Actions spécifiques pour les médecins
+                        $_SESSION['medecin'] = true;
+                        $this->record($_SESSION['user_id'], 'new login');
+                        return $this->render('medecin/dashboard', [
+                            'title' => 'Tableau de bord Médecin',
+                            'content' => 'Bienvenue sur le tableau de bord médecin.',
+                            'user' => $user
+                        ]);
+                        break;
+                    default:
+                        // Actions par défaut
+                        break;
+                }
             } else {
                 $_SESSION['msg'] = 'Identifiants invalides';
-                return $this->render('auth/login', 
-                [
-                    'error' => $_SESSION['msg'],
-                    'title' => 'Connexion échouée',
-                    'content' => 'Veuillez vérifier vos identifiants et réessayer.'
-                ]);
+                return $this->render(
+                    'auth/login',
+                    [
+                        'error' => $_SESSION['msg'],
+                        'title' => 'Connexion échouée',
+                        'content' => 'Veuillez vérifier vos identifiants et réessayer.'
+                    ]
+                );
             }
         } else {
-            return $this->render('auth/login'
-                , [
+            return $this->render(
+                'auth/login',
+                [
                     'title' => 'Connexion',
                     'content' => 'Veuillez vous connecter'
-                ]);
+                ]
+            );
         }
     }
 
@@ -153,7 +199,8 @@ class UsersControllers extends HomeControllers
         $result = $bdd->mon_profil_utilisateur($userid);
         if ($result) {
             $user = $result['users'];
-            return $this->render('profil',
+            return $this->render(
+                'profil',
                 [
                     'user' => $user,
                     'userid' => $result['users_id'],
@@ -163,31 +210,32 @@ class UsersControllers extends HomeControllers
             );
         } else {
             $_SESSION['msg'] = 'Utilisateur non trouvé';
-            return $this->render('profil'
-                , [
+            return $this->render(
+                'profil',
+                [
                     'error' => $_SESSION['msg'],
                     'title' => 'Profil non trouvé',
                     'content' => 'Aucun profil trouvé pour cet utilisateur.'
-                ]);
+                ]
+            );
         }
     }
-    public function record($action){
+    public function record($userId, $action)
+    {
         $this->requireAuth();
         $bdd = new UsersBDD();
-        $userId = $_SESSION['user_id'];
         $timestamp = date('Y-m-d H:i:s');
         $ipAddress = $_SERVER['REMOTE_ADDR'];
         $bdd->record($userId, $action, $timestamp, $ipAddress);
     }
     public function logout()
     {
-       
         $this->requireAuth();
-        $this->record('logout');
+        $this->record($_SESSION['user_id'], 'logout');
         unset($_SESSION['token']);
         unset($_COOKIE['token']);
         // Supprimer les informations de session
-        session_destroy();
+        $_SESSION['msg'] = 'Vous avez été déconnecté avec succès.';
         return $this->render('auth/login', [
             'title' => 'Déconnexion',
             'content' => 'Vous avez été déconnecté avec succès.'
