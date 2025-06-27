@@ -6,8 +6,8 @@
         <?php endif; ?>
         <form action="/login" method="post">
             <div class="form-group">
-                <label for="username">Nom d'utilisateur :</label>
-                <input type="text" id="username" name="username" required>
+                <label for="telephone">telephone :</label>
+                <input type="text" id="telephone" name="telephone" required>
             </div>
             <div class="form-group">
                 <label for="mdp">Mot de passe :</label>

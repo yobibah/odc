@@ -25,7 +25,6 @@ class PatientsBDD
         $stmtUser->bindValue(':password', $patient->getPassword());
         $stmtUser->bindValue(':role', $patient->getRole());
         $resultUser = $stmtUser->execute();
-
         if (!$resultUser) {
             return false;
         }

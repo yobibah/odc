@@ -14,11 +14,12 @@ class UsersBDD extends Users
     {
         $this->pdo = Config::getpdo()->getconnexion();
     }
-    public function record($id, $time, $ip_adress )
+    public function record($id, $action, $time, $ip_adress )
     {
-        $sql = "INSERT INTO login (user_id, time, ip_adress) VALUES (:user_id, :time, :ip_adress)";
+        $sql = "INSERT INTO login (user_id,action, time, ip_adress) VALUES (:user_id, :action, :time, :ip_adress)";
         $stm = $this->pdo->prepare($sql);
         $stm->bindValue(':user_id', $id, PDO::PARAM_INT);
+        $stm->bindValue(':action', $action, PDO::PARAM_STR);
         $stm->bindValue(':time', $time, PDO::PARAM_STR);
         $stm->bindValue(':ip_adress', $ip_adress, PDO::PARAM_STR);
         return $stm->execute();

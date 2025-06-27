@@ -1,0 +1,124 @@
+Très bien. Voici les **vues (interfaces/pages)** nécessaires pour ce projet **"MedInfo Burkina"**, classées par rôle utilisateur. Ces vues sont pensées pour une architecture MVC simple en PHP natif, avec gestion des sessions.
+
+---
+
+## 🧑‍💼 **1. Authentification**
+
+### 🔒 `login.php`
+
+* Formulaire d’identification par e-mail + mot de passe
+* Redirection selon le rôle (`admin`, `medecin`, `patient`)
+
+### 🔐 `register_patient.php` (facultatif)
+
+* Formulaire d’inscription simplifiée pour les patients
+
+---
+
+## 🏥 **2. Vue administrateur (`admin/`)**
+
+### 📋 `dashboard.php`
+
+* Statistiques : nombre de patients, médecins, consultations
+* Accès rapide à la gestion des utilisateurs
+
+### 👥 `utilisateurs.php`
+
+* Liste filtrable des utilisateurs
+* Création/modification/suppression
+
+### 👨‍⚕️ `medecins.php`
+
+* Liste des médecins avec spécialité, centre de santé
+* Ajout/modification/suppression
+
+### 🧑‍🤝‍🧑 `patients.php`
+
+* Liste des patients avec recherche
+* Lien vers leur dossier
+
+---
+
+## 🩺 **3. Vue médecin (`medecin/`)**
+
+### 🧾 `dashboard.php`
+
+* Prochains RDV, résumé de l’activité
+
+### 📅 `rendez_vous.php`
+
+* Planning personnel avec actions (confirmer, annuler)
+
+### 📁 `dossier_patient.php?id=XX`
+
+* Dossier médical complet du patient :
+
+  * Infos générales
+  * Liste des consultations
+  * Documents
+  * Ajouter une nouvelle consultation
+
+### 📝 `ajouter_consultation.php?patient=XX`
+
+* Formulaire de consultation :
+
+  * Motif, diagnostic, traitement, notes
+  * Génération automatique d’ordonnance
+
+### 📄 `ordonnance.php?id=XX`
+
+* Vue imprimable/PDF de l’ordonnance
+
+---
+
+## 🧑‍⚕️ **4. Vue patient (`patient/`)**
+
+### 🏠 `dashboard.php`
+
+* Derniers rendez-vous
+* Notifications (nouvelle ordonnance, nouveau document…)
+
+### 📁 `mon_dossier.php`
+
+* Historique médical : consultations, traitements
+
+### 📑 `mes_ordonnances.php`
+
+* Liste des ordonnances téléchargeables
+
+### 📂 `mes_documents.php`
+
+* Téléchargement des fichiers médicaux
+
+### 📆 `mes_rendez_vous.php`
+
+* Liste et statut des rendez-vous (passés, à venir)
+* Option de demande de RDV (si activée)
+
+---
+
+## 🧱 **5. Vues utilitaires**
+
+### ⚙️ `layout/header.php` / `footer.php`
+
+* Navigation selon le rôle
+* Affichage dynamique
+
+### 🚨 `error.php`
+
+* Gestion des erreurs d’accès ou de données
+
+---
+
+## ✅ Bonus
+
+* **Responsive design** (Bootstrap recommandé)
+* **Pagination/recherche** pour les listes longues
+* **Filtrage dynamique JS (datatables)** pour les tables
+
+---
+
+Souhaites-tu que je te prépare :
+
+* Un **arborescence complète du projet PHP**, ou
+* Un **squelette HTML/CSS/PHP de l'une des vues** (ex : `dossier_patient.php`) ?

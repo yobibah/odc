@@ -41,7 +41,6 @@ class UsersControllers extends HomeControllers
             $bdd = new UsersBDD();
             $success = $bdd->inscription($user);
             if ($success) {
-                $bdd->record($success['users_id'] ?? 0, date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
                 $_SESSION['msg'] = 'Inscription réussie';
                 return $this->render('auth/login',
                 [
@@ -79,15 +78,17 @@ class UsersControllers extends HomeControllers
         $bdd = new UsersBDD();
 
         // 🔁 Connexion par token si fourni
-        if (isset($_SESSION['token'])) {
-            $result = $bdd->getUserByToken($_SESSION['token']);
+        if (isset($_SESSION['token']) || !empty($_COOKIE['token'])) {
+            $result = $bdd->getUserByToken($_SESSION['token'] ?? $_COOKIE['token']);
             if ($result) {
                 $user = $result['users'];
                 $userid = $result['users_id'];
-                $bdd->record($userid, date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
+                $this->record('login');
                 return $this->monProfil($userid);
             } else {
-                unset($_SESSION['token']); // Supprimer le token invalide
+                unset($_SESSION['token']);
+                unset($_COOKIE['token']);
+                // Supprimer le token invalide
                 return $this->requireAuth();
             }
         }
@@ -103,7 +104,8 @@ class UsersControllers extends HomeControllers
                 $_SESSION['token'] = $user->getAuthToken(); // Stocker le token dans la session
                 $_SESSION['nom'] = $user->getNom();
                 $_SESSION['telephone'] = $user->getTelephone();
-                $bdd->record($result['users_id'], date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
+                $_SESSION['user_id'] = $result['users_id'];
+                $this->record('new login');
                 return $this->monProfil($result['users_id']);
             } else {
                 $_SESSION['msg'] = 'Identifiants invalides';
@@ -168,5 +170,27 @@ class UsersControllers extends HomeControllers
                     'content' => 'Aucun profil trouvé pour cet utilisateur.'
                 ]);
         }
+    }
+    public function record($action){
+        $this->requireAuth();
+        $bdd = new UsersBDD();
+        $userId = $_SESSION['user_id'];
+        $timestamp = date('Y-m-d H:i:s');
+        $ipAddress = $_SERVER['REMOTE_ADDR'];
+        $bdd->record($userId, $action, $timestamp, $ipAddress);
+    }
+    public function logout()
+    {
+       
+        $this->requireAuth();
+        $this->record('logout');
+        unset($_SESSION['token']);
+        unset($_COOKIE['token']);
+        // Supprimer les informations de session
+        session_destroy();
+        return $this->render('auth/login', [
+            'title' => 'Déconnexion',
+            'content' => 'Vous avez été déconnecté avec succès.'
+        ]);
     }
 }
