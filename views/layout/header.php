@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        <?php echo isset($data['title']) ? htmlspecialchars($data['title']) : 'ODC'; ?>
+        <?php echo isset($data['title']) ? htmlspecialchars($data['title']) : 'MedInfo Burkina'; ?>
         <?php if (!empty($data['content'])) echo ' | ' . htmlspecialchars($data['content']); ?>
     </title>
     <!-- Bootstrap CSS -->
