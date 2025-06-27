@@ -15,7 +15,7 @@ class consultationBDD extends consultation{
 
     public function addConsultation(consultation $consultation)
     {
-        $sql = "INSERT INTO consultations (patient_id, medecin_id, date_consultation, motif, diagnostique, traitement, note) 
+        $sql = "INSERT INTO consultation (patient_id, medecin_id, date_consultation, motif, diagnostique, traitement, note) 
                 VALUES (:patient_id, :medecin_id, :date_consultation, :motif, :diagnostique, :traitement, :note)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':patient_id', $consultation->getPatientId());
@@ -28,9 +28,9 @@ class consultationBDD extends consultation{
 
         return $stmt->execute();
     }
-    public function getConsultationsByPatientId($patientId)
+    public function getConsultationByPatientId($patientId)
     {
-        $sql = "SELECT * FROM consultations WHERE patient_id = :patient_id";
+        $sql = "SELECT * FROM consultation WHERE patient_id = :patient_id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':patient_id', $patientId);
         $stmt->execute();
@@ -38,7 +38,7 @@ class consultationBDD extends consultation{
     }
     public function getConsultationById($id)
     {
-        $sql = "SELECT * FROM consultations WHERE consultation_id = :id";
+        $sql = "SELECT * FROM consultation WHERE consultation_id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':id', $id);
         $stmt->execute();
@@ -46,7 +46,7 @@ class consultationBDD extends consultation{
     }
     public function updateConsultation(consultation $consultation)
     {
-        $sql = "UPDATE consultations SET patient_id = :patient_id, medecin_id = :medecin_id, date_consultation = :date_consultation, motif = :motif, diagnostique = :diagnostique, traitement = :traitement, note = :note WHERE consultation_id = :id";
+        $sql = "UPDATE consultation SET patient_id = :patient_id, medecin_id = :medecin_id, date_consultation = :date_consultation, motif = :motif, diagnostique = :diagnostique, traitement = :traitement, note = :note WHERE consultation_id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':patient_id', $consultation->getPatientId());
         $stmt->bindValue(':medecin_id', $consultation->getMedecinId());
@@ -60,29 +60,29 @@ class consultationBDD extends consultation{
     }
     public function deleteConsultation($id)
     {
-        $sql = "DELETE FROM consultations WHERE consultation_id = :id";
+        $sql = "DELETE FROM consultation WHERE consultation_id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':id', $id);
         return $stmt->execute();
     }
-    public function countConsultationsByPatientId($patientId)
+    public function countConsultationByPatientId($patientId)
     {
-        $sql = "SELECT COUNT(*) FROM consultations WHERE patient_id = :patient_id";
+        $sql = "SELECT COUNT(*) FROM consultation WHERE patient_id = :patient_id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':patient_id', $patientId);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
-    public function countConsultations()
+    public function countConsultation()
     {
-        $sql = "SELECT COUNT(*) FROM consultations";
+        $sql = "SELECT COUNT(*) FROM consultation";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
-    public function getAllConsultations()
+    public function getAllConsultation()
     {
-        $sql = "SELECT * FROM consultations";
+        $sql = "SELECT * FROM consultation";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -99,5 +99,62 @@ class consultationBDD extends consultation{
                 )
             ];
         }
+    }
+    public function getConsultationByMedecinId($medecinId){
+        $sql = "SELECT * FROM consultation WHERE medecin_id = :medecin_id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':medecin_id', $medecinId);
+        $stmt->execute();
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            return [
+                'consultation_id' => $row['consultation_id'],
+                'consultation' => new consultation(
+                    $row['patient_id'],
+                    $row['medecin_id'],
+                    $row['date_consultation'],
+                    $row['motif'],
+                    $row['diagnostique'],
+                    $row['traitement'],
+                    $row['note']
+                )
+            ];
+        }
+    }
+    public function getConsultationByDate($date)
+    {
+        $sql = "SELECT * FROM consultation WHERE date_consultation = :date_consultation";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':date_consultation', $date);
+        $stmt->execute();
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            return [
+                'consultation_id' => $row['consultation_id'],
+                'consultation' => new consultation(
+                    $row['patient_id'],
+                    $row['medecin_id'],
+                    $row['date_consultation'],
+                    $row['motif'],
+                    $row['diagnostique'],
+                    $row['traitement'],
+                    $row['note']
+                )
+            ];
+        }
+    }
+    public function countConsultationByDate($date)
+    {
+        $sql = "SELECT COUNT(*) FROM consultation WHERE date_consultation = :date_consultation";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':date_consultation', $date);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+    public function countConsultationByMedecinId($medecinId)
+    {
+        $sql = "SELECT COUNT(*) FROM consultation WHERE medecin_id = :medecin_id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':medecin_id', $medecinId);
+        $stmt->execute();
+        return $stmt->fetchColumn();
     }
 }
